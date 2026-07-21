@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($py = \\(Get-Command python -ErrorAction SilentlyContinue\\).Source; if \\(-not $py\\) { $py = \\(Get-Command py -ErrorAction SilentlyContinue\\).Source }; if \\($py\\) { & $py -m py_compile \"Assets\\\\Models\\\\build_beach_models.py\"; if \\($?\\) { \"SYNTAX OK\" } } else { \"python not found\" })",
+      "PowerShell($src = \"C:\\\\Users\\\\kuta\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-kuta-OneDrive---keio-jp----------------Unity-Hub-My-project\\\\d3408074-69db-48bd-8366-41a475546c88\\\\scratchpad\\\\improve.md\"; $dst = Join-Path $PWD.Path \"improve.md\"; $text = [System.IO.File]::ReadAllText\\($src\\); $enc = New-Object System.Text.UTF8Encoding\\($false\\); [System.IO.File]::WriteAllText\\($dst, $text, $enc\\); \"{0} bytes\" -f \\(Get-Item $dst\\).Length)",
+      "PowerShell($py = \\(Get-Command python -ErrorAction SilentlyContinue\\).Source; if \\($py\\) { & $py -m py_compile \"Assets\\\\Models\\\\build_beach_models.py\"; if \\($?\\) { \"SYNTAX OK\" } })",
+      "PowerShell(Set-Location *)",
+      "Bash(grep -v '^\\\\s*//')",
+      "Bash(echo \"--- exit $? \\(1=clean\\) ---\")",
+      "Bash(awk '/^--- !u!1001 &665301192$/,/m_SourcePrefab/' SampleScene.unity)",
+      "Bash(awk '/^--- !u!1001 &929001836$/,/m_SourcePrefab/' Assets/Scenes/SampleScene.unity)",
+      "Bash(python fix_melon.py)",
+      "Bash(sed -n '/② 導入アニメ/,/^    \\\\/\\\\/ ================= ステージ進行/p' SuikawariGame.cs)",
+      "Bash(sed -n '/③④⑤ クリア/,/AutoReturnToTitle\\(clearMenuAutoReturn\\)/p' SuikawariGame.cs)",
+      "Bash(awk '{print $9, $5\" bytes\"}')",
+      "Bash(awk 'NR>=3600 && NR<=3760' SampleScene.unity)",
+      "Bash(awk 'NR<=3709 && /^--- !u!1001 &/ {a=$0; n=NR} END{}' SampleScene.unity)",
+      "Bash(awk -F: '$1<3709')",
+      "Bash(python -)",
+      "PowerShell(git config *)",
+      "Bash(xargs -n1 basename)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git diff *)",
+      "Bash(xargs -0 du -h)",
+      "Bash(xargs -0 du -ch)",
+      "Bash(xargs -0 -I{} find \"{}\" -size +95M)",
+      "Bash(git commit -q -m ' *)"
+    ]
+  }
+}
