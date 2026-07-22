@@ -18,7 +18,7 @@ Unityサマーチャレンジ2026 応募作品（`#Unityサマーチャレンジ
 「スイカ・仲間のペンギン・ビーチボール・海」を割るのが難しくなっていきます。
 ![ゲーム](/images/UI_game.png)
 ![コンソール](/images/UI_console.png)
-![入れ子](/images/UI_many_console.png)
+![入れ子](/images/UI_many_consoles.png)
 
 ### 操作
 
