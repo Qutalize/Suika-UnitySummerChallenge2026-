@@ -4,6 +4,8 @@
 
 Unityサマーチャレンジ2026 応募作品（`#Unityサマーチャレンジ`）。
 
+![メイン](/images/scene.png)
+
 ---
 
 ## ゲーム内容
@@ -12,8 +14,11 @@ Unityサマーチャレンジ2026 応募作品（`#Unityサマーチャレンジ
 ゲーム機の**画面の中**へカメラが潜っていき、その画面の中でまた次のステージを遊ぶ
 ——という「画面の中の画面」が何重にも入れ子になった構造が特徴です。
 
-ステージが進むほど操作の入力が遅れて伝わるようになり、目隠しのまま
-「スイカ・仲間のペンギン・ビーチボール・海」を見分けて割るのが難しくなっていきます。
+ステージが進むほど画面が小さく操作の入力が遅れて伝わるようになり、
+「スイカ・仲間のペンギン・ビーチボール・海」を割るのが難しくなっていきます。
+![ゲーム](/images/UI_game.png)
+![コンソール](/images/UI_console.png)
+![入れ子](/images/UI_many_consoles.png)
 
 ### 操作
 
@@ -37,6 +42,7 @@ Unityサマーチャレンジ2026 応募作品（`#Unityサマーチャレンジ
 
 タイトル画面には **HOW TO PLAY** / **ENDINGS** / **CREDITS** の各ページがあり、
 ENDINGSページでは達成記録のリセットもできます。
+![ホーム](/images/UI_home.png)
 
 ---
 
@@ -44,6 +50,7 @@ ENDINGSページでは達成記録のリセットもできます。
 
 - **入れ子スクリーン描画**（`NestedScreens.cs`）
   RenderTextureを多段にチェインし、ゲーム機の画面に「画面の中の画面…」を実3Dで描画。
+
 - **手続き生成の海**（`GerstnerOcean.cs` / `ShoreWash.cs`）
   Gerstner波でメッシュを変形し、波打ち際の泡を表現。
 - **環境音の自然化**（`AmbientSeagulls.cs`）
@@ -56,28 +63,13 @@ ENDINGSページでは達成記録のリセットもできます。
 
 ---
 
-## 動作環境
-
-- **Unity 6000.3.7f1**（Unity 6 / URP）
-
-`Assets/Scenes/SampleScene.unity` を開いて再生してください。
-
----
-
 ## クレジット
 
 - Game Design / Art / Program — **Quta**
-- ペンギンモデル — **Seaeees 様**（改変して使用）
-- Made with **Unity / Blender / Claude**
+- ペンギンモデル — Seaeees 様（https://booth.pm/ja/items/2780242）（形状や色を変更して使用）
+- パラソル・ゲーム機・スイカ・棒 ： Blenderで自作
+- その他：https://assetstore.unity.com/packages/3d/props/exterior/beach-party-fun-props-pack-80918
+- ファンファーレ、スイカを食べる音・割る音、カモメの声：https://sounddino.com/ja/effects/
+- その他の音源：Claudeが作成
+- Made with Unity / Blender / Claude
 
-> ⚠️ **第三者アセットはリポジトリに含めていません**
-> 再配布不可の素材は、ライセンス保護のため本リポジトリから除外しています。
-> そのため、クローンしただけでは一部のオブジェクトや音が欠けた状態になります。
-> 実行には以下を各自で入手・配置してください:
->
-> - **ペンギンモデル**（Seaeees 様、改変版 `penguin_slim*.fbx`）— `Assets/Models/`
-> - **YGS Beach Party & Fun Pack**（第三者アセット）— `Assets/`
-> - **音源** `EatingMelon.wav` / `hit.mp3` / `kamome.mp3` / `last_sound.mp3` — `Assets/Audio/`
->
-> スイカ・棒・パラソル・ゲーム機などBlenderで自作したモデルと、
-> スクリプト一式（`Assets/Scripts/`）は含まれています。
