@@ -95,6 +95,16 @@ public class SuikawariGame : MonoBehaviour
     public float introBubbleHeight = 0.8f;
     [Tooltip("吹き出し1つあたりの表示時間(秒)")] public float introBubbleDuration = 2f;
 
+    [Header("撮影モード（動画用）")]
+    [Tooltip("ONにすると、ゲームシステム的な文字（タイマー/STAGE/CLEAR/ボタン等）を一切出さず、" +
+             "タイトルのスイカ文字を見せた状態からしばらくして自動でステージへ移り、" +
+             "指定ステージ分プレイ→エンディング→タイトルへ、を無限にループする。")]
+    public bool recordingMode = false;
+    [Tooltip("撮影モードで遊ぶステージ数（通常時の totalStages とは別に指定できる）")]
+    public int recordingStages = 3;
+    [Tooltip("タイトルのスイカ文字を見せてから自動でステージへ移るまでの秒数")]
+    public float recordingTitleHold = 10f;
+
     [Header("UI")]
     [Tooltip("タイトル画面に出すゲーム名")] public string gameTitle = "Suika";
     [Tooltip("日本語フォント(任意)。未設定なら内蔵フォント(英字)")] public Font japaneseFont;
@@ -125,6 +135,9 @@ public class SuikawariGame : MonoBehaviour
 
     public int Stage { get; private set; } = 1;
     public float TimeLeft { get; private set; }
+
+    /// <summary>エンディングへ入るまでのステージ数。撮影モードでは短くできる</summary>
+    int StagesToClear => recordingMode ? Mathf.Max(1, recordingStages) : totalStages;
 
     enum State { Title, Intro, Play, Transition, Ending, ClearMenu, GameOver }
     State state;
@@ -183,7 +196,24 @@ public class SuikawariGame : MonoBehaviour
         nested.SetStage(1);
         SnapCamera(poseWide);
         StartCoroutine(hud.Fade(0f, 0.6f));
-        hud.ShowTitle(() => StartCoroutine(IntroRoutine()));
+
+        if (recordingMode)
+        {
+            // 撮影モード：ボタンは出さずスイカ文字だけ見せ、少し経ったら自動で始める
+            hud.ShowTitle(null, showButtons: false);
+            StartCoroutine(RecordingAutoStart());
+        }
+        else
+        {
+            hud.ShowTitle(() => StartCoroutine(IntroRoutine()));
+        }
+    }
+
+    /// <summary>撮影モード：タイトルを見せてから自動でステージへ移る</summary>
+    IEnumerator RecordingAutoStart()
+    {
+        yield return new WaitForSeconds(recordingTitleHold);
+        yield return IntroRoutine();
     }
 
     // ================= ② 導入アニメ =================
@@ -235,21 +265,33 @@ public class SuikawariGame : MonoBehaviour
         nested.SetNestPose(poseConsole);
         SnapCamera(Stage == 1 ? poseGameplay : poseConsole);
 
-        hud.ShowMessage($"STAGE {Stage}" + (Stage > 1 ? $"\nDELAY {player.inputDelay:0.00}s" : ""), 2.0f);
-        yield return new WaitForSeconds(2.2f);
+        // 撮影モードでは STAGE 表示を出さず、短い間だけ置いて始める
+        if (recordingMode)
+        {
+            yield return new WaitForSeconds(0.6f);
+        }
+        else
+        {
+            hud.ShowMessage($"STAGE {Stage}" + (Stage > 1 ? $"\nDELAY {player.inputDelay:0.00}s" : ""), 2.0f);
+            yield return new WaitForSeconds(2.2f);
+        }
 
         state = State.Play;
         player.enabled = true;
-        hud.SetTimerVisible(true);
+        if (!recordingMode) hud.SetTimerVisible(true);
         TimeLeft = timeLimit;
         while (state == State.Play)
         {
-            TimeLeft -= Time.deltaTime;
-            hud.SetTimer(TimeLeft, Stage);
+            // 撮影モードでは制限時間・海エンドとも無効。スイカを割るまで自由に遊べる
+            if (!recordingMode)
+            {
+                TimeLeft -= Time.deltaTime;
+                hud.SetTimer(TimeLeft, Stage);
 
-            if (TimeLeft <= 0f) Fail(GameEnding.TimeUp);
-            // 海に入ってしまうと、そのまま泳いで行ってしまう
-            else if (player.transform.position.z > seaLineZ) Fail(GameEnding.SwimAway);
+                if (TimeLeft <= 0f) Fail(GameEnding.TimeUp);
+                // 海に入ってしまうと、そのまま泳いで行ってしまう
+                else if (player.transform.position.z > seaLineZ) Fail(GameEnding.SwimAway);
+            }
 
             yield return null;
         }
@@ -294,11 +336,12 @@ public class SuikawariGame : MonoBehaviour
         // seClear と seCheer を同時に鳴らすと音が団子になり、
         // さらにエンディングでも歓声が続くため単調になる。ここは seClear だけにする。
         audioSrc.PlayOneShot(seClear);
-        hud.ShowMessage("STAGE CLEAR!", 1.6f);
+        // 撮影モードでは「STAGE CLEAR」の文字を出さない（音だけ）
+        if (!recordingMode) hud.ShowMessage("STAGE CLEAR!", 1.6f);
         StartCoroutine(HopGroup(1.4f, 0.2f));
         yield return new WaitForSeconds(1.8f);
 
-        if (Stage >= totalStages)
+        if (Stage >= StagesToClear)
         {
             yield return ZoomOutAndEnding();   // ⑥⑦⑧
             yield break;
@@ -330,6 +373,13 @@ public class SuikawariGame : MonoBehaviour
         ending.Play(() => done = true);
         while (!done) yield return null;
         yield return new WaitForSeconds(1.0f);
+
+        // 撮影モード：ALL CLEAR画面もBGMも実績記録も出さず、静かにタイトルへ戻ってループ
+        if (recordingMode)
+        {
+            yield return FadeToTitle();
+            yield break;
+        }
 
         EndingRegistry.Unlock(GameEnding.AllClear);   // トゥルーエンド達成
 
@@ -373,6 +423,9 @@ public class SuikawariGame : MonoBehaviour
     void Fail(GameEnding ending)
     {
         if (state != State.Play) return;
+        // 撮影モードでは失敗させない（仲間やボールを叩いても止めない）。
+        // ゲームオーバーの文字も出さず、撮影が途切れないようにする
+        if (recordingMode) return;
         state = State.GameOver;
         EndingRegistry.Unlock(ending);          // タイトル画面の「達成したエンド」に記録
         StartCoroutine(FailRoutine(ending));

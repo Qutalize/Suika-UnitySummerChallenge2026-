@@ -364,10 +364,15 @@ public class GameHud : MonoBehaviour
 
     // ---------------- 公開API ----------------
 
-    public void ShowTitle(Action onStart)
+    public void ShowTitle(Action onStart, bool showButtons = true)
     {
         HideMenus();
         titlePanel.SetActive(true);
+
+        // 撮影モードではボタンを隠し、スイカのタイトル文字だけを見せる
+        SetTitleButtonsVisible(showButtons);
+        if (!showButtons) return;
+
         BindButton(titlePanel, "START", onStart);
         BindButton(titlePanel, "HOW TO PLAY", () => OpenPage(howToPage));
         // 開くたびに作り直す。直前のプレイで解放したエンドがすぐ反映される
@@ -378,6 +383,16 @@ public class GameHud : MonoBehaviour
             BindResetButton();   // 確認状態を毎回リセットしてから開く
         });
         BindButton(titlePanel, "CREDITS", () => OpenPage(creditsPage));
+    }
+
+    /// <summary>タイトルの4つのボタンだけを表示/非表示する（スイカ文字は残す）</summary>
+    void SetTitleButtonsVisible(bool v)
+    {
+        foreach (var label in new[] { "START", "HOW TO PLAY", "ENDINGS", "CREDITS" })
+        {
+            var t = titlePanel.transform.Find("Btn_" + label);
+            if (t != null) t.gameObject.SetActive(v);
+        }
     }
 
     public void ShowClearMenu(Action onTitle)
